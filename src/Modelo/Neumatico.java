@@ -12,6 +12,9 @@ package Modelo;
 public class Neumatico {
     String cod, marca, modelo;
     int ancho;
+
+    public Neumatico() {
+    }
     
 
     

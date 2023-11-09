@@ -6,9 +6,11 @@
 package Vista;
 
 import Controlador.Conector;
+import Modelo.ComprobacionesGenerales;
 import Modelo.Neumatico;
 import Modelo.Perfil;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -21,10 +23,10 @@ public class ListarNeumaticos extends javax.swing.JDialog {
     /**
      * Creates new form ListarNeumaticos
      */
-    
     //INICIARLIZADOR VARIABLES
     DefaultTableModel modeloTabla = new DefaultTableModel();
     Conector conn = new Conector();
+
     public ListarNeumaticos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -32,8 +34,7 @@ public class ListarNeumaticos extends javax.swing.JDialog {
         actualizarTabla();
     }
 
-    
-    public void crearTabla(){
+    public void crearTabla() {
         modeloTabla.addColumn("Código");
         modeloTabla.addColumn("Marca");
         modeloTabla.addColumn("Modelo");
@@ -42,22 +43,27 @@ public class ListarNeumaticos extends javax.swing.JDialog {
         modeloTabla.addColumn("Precio");
         jTable1.setModel(modeloTabla);
     }
-    
-    
-    public void actualizarTabla(){
-        ArrayList<Neumatico> mostrarTabla = conn.realizarConsultaParametrosNeumatico("SELECT * FROM NEUMATICO");
-        
+
+    public void actualizarTabla() {
+        ArrayList<Neumatico> mostrarTabla = conn.realizarConsultaParametrosNeumatico("SELECT * FROM NEUMATICO", new Neumatico());
+
         for (Neumatico neumatico : mostrarTabla) {
-             Object[] fila = {neumatico.getCod(), neumatico.getMarca(), neumatico.getModelo(), neumatico.getAncho(), neumatico.getPerfil().toString(), neumatico.getPrecio()};
+            Object[] fila = {neumatico.getCod(), neumatico.getMarca(), neumatico.getModelo(), neumatico.getAncho(), neumatico.getPerfil().toString(), neumatico.getPrecio()};
             modeloTabla.addRow(fila);
         }
-        
+
     }
-    
-    public void cargarValoreSeleccionadoTextField(Neumatico neumatico){
+
+    public void borrarTabla() {
+        while (modeloTabla.getRowCount() > 0) {
+            modeloTabla.removeRow(0);
+        }
+    }
+
+    public void cargarValoreSeleccionadoTextField(Neumatico neumatico) {
         int numero = 0;
         Perfil p = neumatico.getPerfil();
-        switch(p){
+        switch (p) {
             case BAJO:
                 numero = 0;
                 break;
@@ -68,7 +74,7 @@ public class ListarNeumaticos extends javax.swing.JDialog {
                 numero = 2;
                 break;
         }
-        
+
         codigo.setText(neumatico.getCod());
         marca.setText(neumatico.getMarca());
         modelo.setText(neumatico.getModelo());
@@ -76,8 +82,7 @@ public class ListarNeumaticos extends javax.swing.JDialog {
         perfilCombo.setSelectedIndex(numero);
         precio.setText(neumatico.getPrecio() + "");
     }
-    
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -121,6 +126,8 @@ public class ListarNeumaticos extends javax.swing.JDialog {
 
         jLabel6.setText("Ancho:");
 
+        codigo.setEditable(false);
+
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(51, 51, 255));
         jLabel7.setText("LISTADO NEUMÁTICOS");
@@ -144,6 +151,11 @@ public class ListarNeumaticos extends javax.swing.JDialog {
         jScrollPane1.setViewportView(jTable1);
 
         botonActualizar.setText("ACTUALIZAR");
+        botonActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonActualizarActionPerformed(evt);
+            }
+        });
 
         botonCancelar.setText("CANCELAR");
 
@@ -244,22 +256,41 @@ public class ListarNeumaticos extends javax.swing.JDialog {
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
 
-                 if (evt.getClickCount() == 1) { // Asegurarse de que sea un clic simple
-                    int filaSeleccionada = jTable1.getSelectedRow();
-                    if (filaSeleccionada >= 0) {
-                        String cod = (String) modeloTabla.getValueAt(filaSeleccionada, 0);
-                        String marca = (String) modeloTabla.getValueAt(filaSeleccionada, 1);
-                        String modelo = (String) modeloTabla.getValueAt(filaSeleccionada, 2);
-                        int ancho = (int) modeloTabla.getValueAt(filaSeleccionada, 3);
-                        String perfil = (String) modeloTabla.getValueAt(filaSeleccionada, 4);
-                        double precio = (double) modeloTabla.getValueAt(filaSeleccionada, 5);
-                        Neumatico neumatico = new Neumatico(cod, marca, modelo, ancho, perfil, precio);
-                        cargarValoreSeleccionadoTextField(neumatico);
-                    }
-                }
+        if (evt.getClickCount() == 1) { // Asegurarse de que sea un clic simple
+            int filaSeleccionada = jTable1.getSelectedRow();
+            if (filaSeleccionada >= 0) {
+                String cod = (String) modeloTabla.getValueAt(filaSeleccionada, 0);
+                String marca = (String) modeloTabla.getValueAt(filaSeleccionada, 1);
+                String modelo = (String) modeloTabla.getValueAt(filaSeleccionada, 2);
+                int ancho = (int) modeloTabla.getValueAt(filaSeleccionada, 3);
+                String perfil = (String) modeloTabla.getValueAt(filaSeleccionada, 4);
+                double precio = (double) modeloTabla.getValueAt(filaSeleccionada, 5);
+                Neumatico neumatico = new Neumatico(cod, marca, modelo, ancho, perfil, precio);
+                cargarValoreSeleccionadoTextField(neumatico);
+            }
+        }
 
 
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void botonActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonActualizarActionPerformed
+        if (!codigo.getText().isEmpty()) {
+            String textoError = ComprobacionesGenerales.comprobarCamposVacios(codigo.getText(), marca.getText(), modelo.getText(), ancho.getText(), perfilCombo.getSelectedItem().toString(), precio.getText());
+
+            if (textoError.isBlank()) {
+                String consulta = "UPDATE NEUMATICO SET marca=?,modelo=?,ancho=?,perfil=?,precio=? WHERE cod=?";
+                Neumatico neumatico = new Neumatico(codigo.getText(), marca.getText(), modelo.getText(), Integer.parseInt(ancho.getText()), perfilCombo.getSelectedItem().toString(), Double.parseDouble(precio.getText()));
+                int[] posicionElementos = {6, 1, 2, 3, 4, 5};
+                conn.realizarConsultaParametros(consulta, neumatico, posicionElementos);
+                borrarTabla();
+                actualizarTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, textoError, "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+
+    }//GEN-LAST:event_botonActualizarActionPerformed
 
     /**
      * @param args the command line arguments

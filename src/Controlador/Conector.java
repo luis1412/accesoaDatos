@@ -5,6 +5,7 @@
  */
 package Controlador;
 
+import Modelo.Factura;
 import com.mysql.cj.jdbc.Driver;
 import java.sql.Statement;
 import java.sql.Connection;
@@ -97,18 +98,18 @@ public class Conector {
         
         return encontrado;
     }
+   
     
-    
-    public void realizarConsultaParametros(String consultaPreparada, Neumatico neumatico){
+    public void realizarConsultaParametros(String consultaPreparada, Neumatico neumatico, int[] posicionElementos ){
         if (conectar()) {
             try {
                 ps = conn.prepareStatement(consultaPreparada);
-                ps.setString(1, neumatico.getCod());
-                ps.setString(2, neumatico.getMarca());
-                ps.setString(3, neumatico.getModelo());
-                ps.setInt(4, neumatico.getAncho());
-                ps.setString(5, neumatico.getPerfil().toString());
-                ps.setDouble(6, neumatico.getPrecio());
+                ps.setString(posicionElementos[0], neumatico.getCod());
+                ps.setString(posicionElementos[1], neumatico.getMarca());
+                ps.setString(posicionElementos[2], neumatico.getModelo());
+                ps.setInt(posicionElementos[3], neumatico.getAncho());
+                ps.setString(posicionElementos[4], neumatico.getPerfil().toString());
+                ps.setDouble(posicionElementos[5], neumatico.getPrecio());
                 ps.executeUpdate();
             } catch (SQLException e) {
                e.printStackTrace();
@@ -117,8 +118,9 @@ public class Conector {
         cerrarConexion();
     }
     
-    public ArrayList<Neumatico> realizarConsultaParametrosNeumatico(String consultaPreparada){
-        ArrayList<Neumatico> neumaticosBD = new ArrayList<>();
+    
+    public <T>ArrayList<T> realizarConsultaParametrosNeumatico(String consultaPreparada, T objeto){
+        ArrayList<T> listaMostrar = new ArrayList<>();
 
 
         if (conectar()) {
@@ -129,7 +131,12 @@ public class Conector {
                 rs = stmt.executeQuery(consultaPreparada);
                 
                 while (rs.next()) {
-                   neumaticosBD.add(new Neumatico(rs.getString("cod"), rs.getString("marca"), rs.getString("modelo"), rs.getInt("ancho"), rs.getString("perfil"), rs.getDouble("precio")));
+                    if (objeto instanceof Neumatico) {
+                        listaMostrar.add((T) new Neumatico(rs.getString("cod"), rs.getString("marca"), rs.getString("modelo"), rs.getInt("ancho"), rs.getString("perfil"), rs.getDouble("precio")));
+                    }
+                    else if (objeto instanceof Factura) {
+                        listaMostrar.add((T) new Factura(rs.getInt("numlinea"), rs.getInt("numfactura"), rs.getInt("codneumatico"), rs.getString("concepto"), rs.getInt("numneumaticos"), rs.getDouble("precio")));
+                    }
                 }
                 
             } catch (SQLException e) {
@@ -138,7 +145,7 @@ public class Conector {
         }
         cerrarConexion();
         
-        return neumaticosBD;
+        return listaMostrar;
     }
     
     

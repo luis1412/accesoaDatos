@@ -5,6 +5,12 @@
  */
 package Vista;
 
+import Controlador.Conector;
+import Modelo.Factura;
+import Modelo.Neumatico;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Usuario
@@ -14,9 +20,64 @@ public class CrearFactura extends javax.swing.JDialog {
     /**
      * Creates new form CrearFactura
      */
+    DefaultTableModel modeloTabla = new DefaultTableModel();
+    Conector conn = new Conector();
+    
     public CrearFactura(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        crearTabla();
+        actualizarTabla();
+    }
+    
+    public void crearTabla() {
+        modeloTabla.addColumn("Cód-Neumático");
+        modeloTabla.addColumn("Concepto");
+        modeloTabla.addColumn("Cantidad");
+        modeloTabla.addColumn("Precio");
+        jTable1.setModel(modeloTabla);
+    }
+    
+    public void actualizarTabla() {
+        ArrayList<Factura> mostrarTabla = conn.realizarConsultaParametrosNeumatico("SELECT * FROM linea_factura", new Factura());
+
+        for (Factura factura : mostrarTabla) {
+            Object[] fila = {factura.getCodNeumatico(), factura.getConcepto(), factura.getNumNeumaticos(), factura.getPrecio()};
+            modeloTabla.addRow(fila);
+        }
+
+    }
+    
+    
+    public String marca(){
+        return jMarca.getText();
+    }
+    public String numeroFactura(){
+        return jNumFactura.getText();
+    }
+    public String nifEmisor(){
+        return jNifEmisor.getText();
+    }
+    public String nifCliente(){
+        return nifCliente.getSelectedItem().toString();
+    }
+    public String ano(){
+        return jAno.getText();
+    }
+    public String codigoNeumatico(){
+        return codigoNeumaticoCombo.getSelectedItem().toString();
+    }
+    public String unidades(){
+        return jUnidades.getText();
+    }
+    public String precioUnidad(){
+        return jPrecioU.getText();
+    }
+    public String fechaActual(){
+        return jFechaActual.getText();
+    }
+    public String iva(){
+        return jIva.getText();
     }
 
     /**
@@ -32,7 +93,7 @@ public class CrearFactura extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        nifCliente = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -77,7 +138,7 @@ public class CrearFactura extends javax.swing.JDialog {
 
         jLabel2.setText("NIF:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        nifCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -87,7 +148,7 @@ public class CrearFactura extends javax.swing.JDialog {
                 .addGap(17, 17, 17)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(nifCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(58, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -96,7 +157,7 @@ public class CrearFactura extends javax.swing.JDialog {
                 .addGap(27, 27, 27)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(nifCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
@@ -122,6 +183,12 @@ public class CrearFactura extends javax.swing.JDialog {
         codigoNeumaticoCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 codigoNeumaticoComboActionPerformed(evt);
+            }
+        });
+
+        jNumFactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jNumFacturaActionPerformed(evt);
             }
         });
 
@@ -368,6 +435,10 @@ public class CrearFactura extends javax.swing.JDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_codigoNeumaticoComboActionPerformed
 
+    private void jNumFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jNumFacturaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jNumFacturaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -410,6 +481,7 @@ public class CrearFactura extends javax.swing.JDialog {
         });
     }
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonAnadir;
     private javax.swing.JButton botonCancelar;
@@ -417,7 +489,6 @@ public class CrearFactura extends javax.swing.JDialog {
     private javax.swing.JButton botonGuardar;
     private javax.swing.JComboBox<String> codigoNeumaticoCombo;
     private javax.swing.JTextField jAno;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JTextField jFechaActual;
     private javax.swing.JTextField jIva;
     private javax.swing.JLabel jLabel1;
@@ -448,5 +519,6 @@ public class CrearFactura extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jUnidades;
+    private javax.swing.JComboBox<String> nifCliente;
     // End of variables declaration//GEN-END:variables
 }

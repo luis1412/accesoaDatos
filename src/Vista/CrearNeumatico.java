@@ -6,6 +6,7 @@
 package Vista;
 
 import Controlador.Conector;
+import Modelo.ComprobacionesGenerales;
 import Modelo.Neumatico;
 import Modelo.Perfil;
 import static java.awt.image.ImageObserver.ERROR;
@@ -206,20 +207,10 @@ public class CrearNeumatico extends javax.swing.JDialog {
     private void botonGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGuardarActionPerformed
 
         Conector c = new Conector();
-
-        if (codigo.getText().isEmpty() || !comprobarNumerico(codigo.getText())) {
-            JOptionPane.showMessageDialog(this,  "No se ha introducido el codigo, o no es un numero", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } else if (marca.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No se ha introducido la marca", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } else if (modelo.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No se ha introducido el modelo" ,"ERROR", JOptionPane.ERROR_MESSAGE);
-        } else if (ancho.getText().isEmpty() || !comprobarNumerico(ancho.getText())) {
-                JOptionPane.showMessageDialog(this, "No se ha introducido el ancho, o no es un numero",  "ERROR",JOptionPane.ERROR_MESSAGE);
-            
-        } else if (precio.getText().isEmpty() || !comprobarDobule(precio.getText())) {
-                JOptionPane.showMessageDialog(this, "No se ha introducido el precio, o no es un numero", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } else {
-            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea guardar este neumatico en la base de datos?", "Confirmar Cambios", JOptionPane.YES_NO_CANCEL_OPTION);
+      String error = ComprobacionesGenerales.comprobarCamposVacios(codigo.getText(), marca.getText(), modelo.getText(), ancho.getText(), perfilCombo.getSelectedItem().toString(), precio.getText());
+        
+        if (error.isBlank()) {
+                int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea guardar este neumatico en la base de datos?", "Confirmar Cambios", JOptionPane.YES_NO_CANCEL_OPTION);
              if (confirmacion == JOptionPane.YES_OPTION) {
             String perfil = (String) perfilCombo.getSelectedItem();
             Neumatico insertarNeumatico = new Neumatico(codigo.getText(),
@@ -228,7 +219,8 @@ public class CrearNeumatico extends javax.swing.JDialog {
                     Integer.parseInt(ancho.getText()),
                     perfil,
                     Integer.parseInt(precio.getText()));
-            c.realizarConsultaParametros("INSERT INTO neumatico VALUES (?,?,?,?,?,?)", insertarNeumatico);
+            int[] posicionElementos = {1,2,3,4,5,6};
+            c.realizarConsultaParametros("INSERT INTO neumatico VALUES (?,?,?,?,?,?)", insertarNeumatico, posicionElementos);
             borrarTexto();
             JOptionPane.showMessageDialog(null, "Cambios guardados.");
         } else if (confirmacion == JOptionPane.NO_OPTION) {
@@ -237,9 +229,10 @@ public class CrearNeumatico extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(null, "Cambios cancelados.");
             borrarTexto();
         }
-            
         }
-
+        else{
+         JOptionPane.showMessageDialog(this, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
 
     }//GEN-LAST:event_botonGuardarActionPerformed
 
